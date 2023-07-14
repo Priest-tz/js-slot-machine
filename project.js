@@ -6,6 +6,7 @@
 // Give user winner or otherwise
 // Play again or end session
 
+
 const prompt = require("prompt-sync")();
 
 const ROWS = 3;
@@ -25,6 +26,7 @@ const SYMBOL_VALUES = {
   D: 2
 };
 
+// Function to prompt the user for a deposit amount and validate it
 const deposit = () => {
   while (true) {
     const depositAmount = prompt("Enter a deposit amount: ");
@@ -38,6 +40,7 @@ const deposit = () => {
   }
 };
 
+// Function to prompt the user for the number of lines to bet on and validate it
 const getNumberOfLines = () => {
   while (true) {
     const lines = prompt("Enter the number of lines to bet on (1-3): ");
@@ -51,6 +54,7 @@ const getNumberOfLines = () => {
   }
 };
 
+// Function to prompt the user for the bet amount per line and validate it based on the balance and number of lines
 const getBet = (balance, lines) => {
   while (true) {
     const bet = prompt("Enter the total bet per line: ");
@@ -64,6 +68,7 @@ const getBet = (balance, lines) => {
   }
 };
 
+// Function to spin the reels and generate random symbols
 const spin = () => {
   const symbols = [];
   for (const [symbol, count] of Object.entries(SYMBOLS_COUNT)) {
@@ -87,6 +92,7 @@ const spin = () => {
   return reels;
 };
 
+// Function to transpose the reels array
 const transpose = (reels) => {
   const rows = [];
 
@@ -100,32 +106,22 @@ const transpose = (reels) => {
   return rows;
 };
 
+// Function to print the rows of symbols
 const printRows = (rows) => {
   for (const row of rows) {
-    let rowString = "";
-    for (const [i, symbol] of row.entries()) {
-      rowString += symbol;
-      if (i !== row.length - 1) {
-        rowString += " | ";
-      }
-    }
+    let rowString = row.join(" | ");
     console.log(rowString);
   }
 };
 
+// Function to calculate the winnings based on the symbol rows, bet amount, and number of lines
 const getWinnings = (rows, bet, lines) => {
   let winnings = 0;
 
   for (let row = 0; row < lines; row++) {
     const symbols = rows[row];
-    let allSame = true;
-
-    for (const symbol of symbols) {
-      if (symbol !== symbols[0]) {
-        allSame = false;
-        break;
-      }
-    }
+    
+    const allSame = symbols.every((symbol) => symbol === symbols[0]);
 
     if (allSame) {
       winnings += bet * SYMBOL_VALUES[symbols[0]];
@@ -135,11 +131,12 @@ const getWinnings = (rows, bet, lines) => {
   return winnings;
 };
 
+// Function to implement the main game logic
 const game = () => {
   let balance = deposit();
 
   while (true) {
-    console.log("You have a balance of $" + balance);
+    console.log("You have a balance of $" + balance.toFixed(2));
     const numberOfLines = getNumberOfLines();
     const bet = getBet(balance, numberOfLines);
     balance -= bet * numberOfLines;
@@ -148,21 +145,21 @@ const game = () => {
     printRows(rows);
     const winnings = getWinnings(rows, bet, numberOfLines);
     balance += winnings;
-    console.log("You won $ " + winnings.toString());
+    console.log("You won $" + winnings.toFixed(2));
 
     if (balance <= 0) {
       console.log("You ran out of money!");
       break;
     }
 
-    const playAgain = prompt("Do you want to play again (y/n)?");
+    const playAgain = prompt("Do you want to play again (y/n)?").toLowerCase();
 
-    if (playAgain != "y") {
+    if (playAgain !== "y") {
       console.log("Thank you for playing");
       break;
     }
   }
 };
 
+// Start the game
 game();
-
